@@ -1,47 +1,63 @@
-use clap::builder::Arg;
+use clap::builder::{App, Arg};
 use clap::Command;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 
 use std::env;
 
-fn main() {
-    let cli_app = Command::new("Hug-Reminder")
+fn get_app() -> App<'static> {
+    Command::new("Hug-Reminder")
         .about("About section")
         .args(&[Arg::new("env-file")
             .short('e')
             .long("env_file")
             .default_value("dev.env")
-            .help("Path to env file")]);
+            .help("Path to env file")])
+}
 
-    let matches = cli_app.get_matches();
+fn get_info_for_email() -> Result<(String, String, String), String> {
+    let wanted_variables = vec!["YAHOO_EMAIL", "YAHOO_PASSWORD", "PHONE_NUMBER_EMAIL"];
+    let mut results: Vec<String> = vec![];
+    let mut errors: Vec<String> = vec![];
 
-    let env_file_path = matches.get_one::<String>("env-file").unwrap();
-    println!("{:?}", env_file_path);
+    for variable in wanted_variables.iter() {
+        let temp = env::var(variable);
+        if let Ok(value) = temp {
+            results.push(value);
+        } else {
+            errors.push(format!(
+                "Unable to find {} in environment variables",
+                &variable
+            ));
+        }
+    }
 
-    println!("matches: {:?}", matches);
+    if !errors.is_empty() {
+        let error_msg = errors.join(", ");
+        return Err(error_msg);
+    }
 
-    let _ = dotenv::from_filename(env_file_path).ok();
+    let to_email = results.pop().unwrap();
+    let password = results.pop().unwrap();
+    let email = results.pop().unwrap();
 
-    let email =
-        env::var("YAHOO_EMAIL").expect("Unable to find 'YAHOO_EMAIL' in the environment variables");
-    let phone_number = env::var("PHONE_NUMBER")
-        .expect("Unable to find 'PHONE_NUMBER' in the environment variables");
-    let password = env::var("YAHOO_PASSWORD").unwrap();
+    Ok((email, password, to_email))
+}
 
-    println!("email: {:?}", email);
-    println!("phone_number: {:?}", phone_number);
-    println!("password: {:?}", password);
-
+fn send_email(
+    email: String,
+    password: String,
+    to_email: String,
+    subject: String,
+    body: String,
+) -> Result<(), String> {
     let email_message = Message::builder()
         .from(format!("Marcus Willock <{email}>").parse().unwrap())
-        .to(
-            format!("{} <{}@message.ting.com>", "Marcus Willock", phone_number)
-                .parse()
-                .unwrap(),
-        )
-        .subject("subject line")
-        .body("Body line".to_string())
+        .to(format!("{} <{}>", "Marcus Willock", to_email)
+            .parse()
+            .unwrap())
+        .subject(subject)
+        .body(body)
         .unwrap();
 
     let creds = Credentials::new(email, password);
@@ -52,7 +68,30 @@ fn main() {
         .build();
 
     match mailer.send(&email_message) {
-        Ok(_) => println!("Email sent successfully!"),
-        Err(e) => panic!("Could not send email: {:?}", e),
+        Ok(_) => {
+            println!("Email was sent");
+            Ok(())
+        }
+        Err(e) => Err(format!("Could not send email: {:?}", e)),
     }
+}
+
+fn main() -> Result<(), String> {
+    let cli_app = get_app();
+
+    let matches = cli_app.get_matches();
+
+    let env_file_path = matches.get_one::<String>("env-file").unwrap();
+    let _ = dotenv::from_filename(env_file_path).ok();
+
+    let (email, password, to_email) = get_info_for_email()?;
+    let subject = "Hug Reminder".to_string();
+    let body = "Will fill out body later".to_string();
+
+    if env_file_path.starts_with("dev") {
+        println!("We do not send emails in dev");
+    } else {
+        let _ = send_email(email, password, to_email, subject, body)?;
+    }
+    Ok(())
 }
