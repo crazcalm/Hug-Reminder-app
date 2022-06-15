@@ -12,3 +12,11 @@ lettre = "0.10.0-rc.7"
 [dependencies.clap]
 version = "3.2.3"
 features = ["default", "wrap_help"]
+
+[dependencies.rusqlite]
+version = "0.27.0"
+features = ["bundled-full"]
+
+[dependencies.chrono]
+version = "0.4.19"
+features = ["default"]

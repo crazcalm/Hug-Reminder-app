@@ -1,4 +1,5 @@
 pub mod cli;
+pub mod db;
 pub mod email;
 
 fn main() -> Result<(), String> {
