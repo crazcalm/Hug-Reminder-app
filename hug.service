@@ -1,0 +1,13 @@
+# hug.service
+[Unit]
+Description= Hug Reminder app
+Documentation= https://github.com/crazcalm/Hug-Reminder-app
+
+[Service]
+Type= simple
+User= crazcalm
+
+ExecStart=/home/crazcalm/hug_app && ./app -e prod.env
+
+[Install]
+WantedBy= multi-user.target

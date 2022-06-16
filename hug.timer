@@ -1,0 +1,11 @@
+# hug.timer
+[Unit]
+Description=Runs the hug reminder app
+
+[Timer]
+OnCalendar=Mon..Sun *-*-* 10..22:00,30:00
+Persistent=true
+Unit=hug.service
+
+[Install]
+WantedBy=timers.target
