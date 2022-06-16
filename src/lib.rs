@@ -2,6 +2,7 @@ pub mod cli;
 pub mod db;
 pub mod email;
 
+/*
 fn main() -> Result<(), String> {
     let cli_app = cli::get_app();
 
@@ -21,3 +22,4 @@ fn main() -> Result<(), String> {
     }
     Ok(())
 }
+*/

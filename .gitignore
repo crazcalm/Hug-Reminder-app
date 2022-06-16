@@ -13,6 +13,9 @@ Cargo.lock
 # prod environment variables
 prod.env
 
+# database
+*hugs.db
+
 ## Personal
 # vim swp files
 *.swp

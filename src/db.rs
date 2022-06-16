@@ -40,7 +40,7 @@ pub fn initialize_db(conn: DBLocal) -> Result<(), String> {
     }
 }
 
-pub fn get_hug_count_by_date(conn: DBLocal, date: String) -> i32 {
+pub fn get_hug_count_by_date(conn: DBLocal, date: String) -> usize {
     conn.query_row(
         "SELECT COUNT(datetime) from record where DATE(datetime) == DATE(?);",
         params![date],
