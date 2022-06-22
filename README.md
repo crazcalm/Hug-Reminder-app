@@ -1,6 +1,11 @@
 # Hug-Reminder-app
 A reminder system to help remind me to hug others.
 
+**Note**: This project is far from perfect, but it is good enough and I think I can live with that.
+
+## Yahoo Generate security token
+Follow instructions on this [page](https://help.yahoo.com/kb/SLN15241.html)
+
 ## Initialize database:
 ```
 cargo run --bin db-init
@@ -26,7 +31,7 @@ I use the following:
 ```
 Mon..Sun *-*-* 10..22:00,30:00
 ```
-This should be Monday-Sunday everyday from 10am to 10pm every 30 minutes (00 minutes and 30 minutes).
+This should be Monday-Sunday everyday from 10am to 10pm every 30 minutes (00 minutes and 30 minutes). -> 10am - 10:30pm
 
 ### Helpful commands:
 
