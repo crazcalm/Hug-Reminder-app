@@ -2,22 +2,6 @@ use chrono::prelude::*;
 use hug_reminder::{cli, db, email};
 use rand::prelude::*;
 
-fn should_send_email(
-    hug_goal: usize,
-    current_hug_count: usize,
-    hit_percentage: usize,
-    rand_number: usize,
-) -> bool {
-    if current_hug_count >= hug_goal {
-        return false;
-    }
-
-    if hit_percentage >= rand_number {
-        return true;
-    }
-    false
-}
-
 fn main() -> Result<(), String> {
     let cli_app = cli::get_app();
 
@@ -55,4 +39,45 @@ fn main() -> Result<(), String> {
         println!("We are not sending an email");
     }
     Ok(())
+}
+
+fn should_send_email(
+    hug_goal: usize,
+    current_hug_count: usize,
+    hit_percentage: usize,
+    rand_number: usize,
+) -> bool {
+    if current_hug_count >= hug_goal {
+        return false;
+    }
+
+    if hit_percentage >= rand_number {
+        return true;
+    }
+    false
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_should_send_email() {
+        let test_cases: Vec<(usize, usize, usize, usize, bool)> = vec![
+            (10, 0, 50, 30, true),
+            (10, 9, 50, 30, true),
+            (10, 10, 50, 30, false),
+            (10, 11, 50, 30, false),
+            (10, 0, 50, 50, true),
+            (10, 0, 50, 51, false),
+        ];
+
+        for (hug_goal, current_hug_count, hit_percentage, rand_number, expected_result) in
+            test_cases
+        {
+            let result =
+                should_send_email(hug_goal, current_hug_count, hit_percentage, rand_number);
+            assert_eq!(result, expected_result);
+        }
+    }
 }
